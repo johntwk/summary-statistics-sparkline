@@ -1,3 +1,8 @@
+# Class Name: summary
+# Date      : December 28th, 2017
+# Purpose   : take a Pandas dataframe and print summary statistics, 
+#             draw sparklines, generate latex code for reporting, and 
+#             generate pdf report
 class summary:
     df   = None
     mean = None
@@ -172,6 +177,7 @@ class summary:
                 import numpy as np
                 #% matplotlib inline
                 x = np.array(x)
+                file_name = file_name.replace(' ','_')
                 fig, ax = plt.subplots(1,1,figsize=(10,3))
                 plt.plot(x, color='k')
                 plt.plot(len(x)-1, x[-1], color='r', marker='o')
@@ -268,7 +274,8 @@ class summary:
                 tex_content += 'Sparkline&'
                 for index in range(col_start_lst[counter], col_end_lst[counter]):
                     img_cmd = "\\includegraphics[scale=0.1]{"
-                    img_path = "\""+sparkline_lst[index][1]+"\""
+                    tmp = sparkline_lst[index][1]
+                    img_path = "\""+tmp.replace(' ','_')+"\""
                     tex_content += img_cmd+img_path+"}"+"&"
                 tex_content = tex_content[:-1]+"\\\\\n"
             tex_content += latex_tail+"\n\n"
@@ -322,28 +329,13 @@ class summary:
 \\begin{document}'''
         latex_file_tail = '\\end{document}'
         tex_content = latex_file_head + tex_content + latex_file_tail
-        def compile_latex(code):
-            class latex:
-                code = None
-                tex_file_name = None
-                def __init__(self,code, file_name):
-                    self.code = code
-                    self.tex_file_name = file_name
-                    f = open(file_name, "w")
-                    f.write(code)
-                    f.close()
-                def compile_to_pdf(self, compiler="pdflatex"):
-                    import os  
-                    cwd = os.getcwd()+"\\"
-                    print "cwd:"+cwd
-                    cmd = compiler + " "+ "\""+ cwd + self.tex_file_name + "\""
-                    print cmd
-                    #os.system("pdflatex ./summary/summary.tex")
-                    os.system("cd "+path)
-                    print os.system(cmd)
-                    print os.system("dir")
-            print "in:",path+file_name+".tex"
-            latex_obj = latex(tex_content,path+file_name+".tex")
-            latex_obj.compile_to_pdf()
-        compile_latex(tex_content)
-        return latex_file_head + tex_content + latex_file_tail
+        #print tex_content
+        #print file_name
+        f = open(path+file_name+".tex", "w")
+        f.write(tex_content)
+        f.close()       
+        import os  
+        cwd = os.getcwd()+"\\"+"summary\\"
+        cmd = "pdflatex" + " "+ "\""+ cwd + file_name+".tex" + "\""       
+        #print cmd        
+        return os.system(cmd)
